@@ -9,7 +9,8 @@ include_directories(
 link_directories(lib)
 
 set(EXAMPLES_FILES
-    examples/data_grabber_itmo.cpp
+    examples/data_grabber_pos_itmo.cpp
+    examples/data_grabber_torque_itmo.cpp
 )
 
 foreach(EXAMPLE_FILE IN LISTS EXAMPLES_FILES)

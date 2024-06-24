@@ -141,13 +141,13 @@ int main(int argc, char *argv[]) {
     Timer timer(arm._ctrlComp->dt);
 
     ////////////////////////////////
-    // 0. Move to initial pose
+    // 0. Move to initial pose (alternative may be in candle? 0 90 -160 -20 0 0)
     q_0 = arm.lowstate->getQ();
-    q_des << 0.0, 1.09955743, -1.09955743, 1.57079633, 0.0, 0.0;
-
-    for(int i(0); i<1000; i++){
-        arm.q = q_0 * (1-i/1000) + q_des * (i/1000);
-        arm.qd = (q_des - q_0) / (1000 * arm._ctrlComp->dt);
+    q_des << 0.0, 1.09955743, -1.09955743, 1.57079633, 0.0, 0.0; // stow pose
+    double duration = 1000;
+    for(int i(0); i<duration; i++){ //  2 seconds for dt=0.002
+        arm.q = q_0 * (1-i/duration) + q_des * (i/duration);
+        arm.qd = (q_des - q_0) / (duration * arm._ctrlComp->dt);
         arm.tau = arm._ctrlComp->armModel->inverseDynamics(arm.q, arm.qd, Vec6::Zero(), Vec6::Zero());
         arm.setArmCmd(arm.q, arm.qd, arm.tau);
         arm.sendRecv();
@@ -205,6 +205,16 @@ int main(int argc, char *argv[]) {
                     arm.setArmCmd(arm.q, arm.qd, arm.tau);
                     arm.sendRecv();
                     timer.sleep();
+
+                    // q_des, dq_des, calc_ID_tau, q, dq, ddq, tau, time
+                    log_file << arm.q.transpose() << " ";
+                    log_file << arm.qd.transpose() << " ";
+                    log_file << arm.tau.transpose() << " ";
+                    log_file << arm.lowstate->getQ().transpose() << " ";
+                    log_file << arm.lowstate->getQd().transpose() << " ";
+                    log_file << arm.lowstate->getQdd().transpose() << " ";
+                    log_file << arm.lowstate->getTau().transpose() << " ";
+                    log_file << i * arm._ctrlComp->dt << "\n";
                 }
             }
             log_file.close();
@@ -219,7 +229,7 @@ int main(int argc, char *argv[]) {
             
             for (int j(0); j < params.size(); ++j) {
                 // save data separately for each sin-signal parameters
-                log_file.open("data_sinusoidal_" + std::to_string(j) + "_joint_" + std::to_string(k) + ".txt");
+                log_file.open("data_sinusoidal_exp" + std::to_string(j) + "_joint_" + std::to_string(k) + ".txt");
 
                 SinusoidalTrajectory sinusoid;
                 q_0 = arm.lowstate->getQ();
@@ -245,6 +255,16 @@ int main(int argc, char *argv[]) {
                     arm.setArmCmd(arm.q, arm.qd, arm.tau);
                     arm.sendRecv();
                     timer.sleep();
+
+                    // q_des, dq_des, calc_ID_tau, q, dq, ddq, tau, time
+                    log_file << arm.q.transpose() << " ";
+                    log_file << arm.qd.transpose() << " ";
+                    log_file << arm.tau.transpose() << " ";
+                    log_file << arm.lowstate->getQ().transpose() << " ";
+                    log_file << arm.lowstate->getQd().transpose() << " ";
+                    log_file << arm.lowstate->getQdd().transpose() << " ";
+                    log_file << arm.lowstate->getTau().transpose() << " ";
+                    log_file << i * arm._ctrlComp->dt << "\n";
                 }
                 log_file.close();       
             }

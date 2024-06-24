@@ -9,10 +9,7 @@ include_directories(
 link_directories(lib)
 
 set(EXAMPLES_FILES
-    examples/highcmd_basic.cpp
-    examples/highcmd_development.cpp
-    examples/lowcmd_development.cpp
-    examples/lowcmd_multirobots.cpp
+    examples/data_grabber_itmo.cpp
 )
 
 foreach(EXAMPLE_FILE IN LISTS EXAMPLES_FILES)

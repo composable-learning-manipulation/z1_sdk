@@ -7,6 +7,9 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 
 using namespace UNITREE_ARM;
 
@@ -18,7 +21,20 @@ Vec6 to_vec6(Vec6 var0, double value, double index) {
 };
 
 
+void simple_logger(const std::string& msg) {
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+    std::tm buf;
+    localtime_r(&in_time_t, &buf);
+    std::cout << std::put_time(&buf, "%Y-%m-%d %H:%M:%S");
+    std::cout << '.' << std::setw(3) << std::setfill('0') << ms.count();
+    std::cout << " - " << msg << std::endl;
+}
+
+
 int main(int argc, char *argv[]) {
+    simple_logger("Starting...");
     std::ofstream log_file;
 
     std::cout << std::fixed << std::setprecision(3);
@@ -42,9 +58,9 @@ int main(int argc, char *argv[]) {
 
     ////////////////////////////////
     // 0. Move to initial pose
+    simple_logger("Move to initial pose.");
     q_0 = arm.lowstate->getQ();
     q_des << 0.0, 1.57079633, -2.7925268, -0.34906585, 0.0, 0.0; // `candle` position
-
     for(int i(0); i<1000; i++){
         arm.q = q_0 * (1-i/1000) + q_des * (i/1000);
         arm.qd = (q_des - q_0) / (1000 * arm._ctrlComp->dt);
@@ -62,6 +78,7 @@ int main(int argc, char *argv[]) {
 
     for (auto k: joint_ids) {
 
+        simple_logger("Start experiments for joint: " + std::to_string(k) +".");
         ////////////////////////////////
         // Sinusoidal experiment
         {
@@ -80,6 +97,8 @@ int main(int argc, char *argv[]) {
             std::vector<std::pair<double, double>> params = {{0.1, 0.5}, {0.05, 2}}; // where pair is <A, omega>
             
             for (int j(0); j < params.size(); ++j) {
+                simple_logger("Experiment " + std::to_string(j) + ": sinusoidal");
+
                 // save data separately for each sin-signal parameters
                 log_file.open("data_sinusoidal_exp" + std::to_string(j) + "_joint_" + std::to_string(k) + "_torque.txt");
 
@@ -129,5 +148,6 @@ int main(int argc, char *argv[]) {
     arm.backToStart();
     arm.setFsm(ArmFSMState::PASSIVE);
     arm.sendRecvThread->shutdown();
+    simple_logger("Finish.");
     return 0;
 }

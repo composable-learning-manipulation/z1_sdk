@@ -51,6 +51,8 @@ int main(int argc, char *argv[]) {
     arm._ctrlComp->lowcmd->setControlGain(KP, KW);
     arm.sendRecvThread->shutdown();
 
+    simple_logger("Control loop [Hz]: " + std::to_string(1/arm._ctrlComp->dt));
+
     Vec6 vec_zero; vec_zero.setZero();
     Vec6 q_0;
     Vec6 q_des;
@@ -94,7 +96,7 @@ int main(int argc, char *argv[]) {
             arm.sendRecvThread->shutdown();
     
             // sin-signal parameters
-            std::vector<std::pair<double, double>> params = {{0.1, 0.5}, {0.05, 2}}; // where pair is <A, omega>
+            std::vector<std::pair<double, double>> params = {{0.5, 2.0}, {1.0, 6.0}}; // where pair is <A, omega>
             
             for (int j(0); j < params.size(); ++j) {
                 simple_logger("Experiment " + std::to_string(j) + ": sinusoidal");

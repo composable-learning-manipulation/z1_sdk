@@ -1,6 +1,7 @@
 
 ### Data grabber for Unitree z1 manipulator
 
+
 #### Installation no-ros sdk
 
 1. Make a new directory and clone controller and sdk.
@@ -62,3 +63,24 @@
     cd ~/grab_data_itmo/z1_sdk/
     tar -cf data_z1_for_itmo.tar ./*.txt
     ```
+
+### Experiments description
+
+ТТХ робота:
+tau_max = 33
+tau_min = 0.2
+dq_max = M_PI
+
+
+1. trapezoid
+- q \pm M_PI/2
+- dq_max = M_PI/2
+- ddq_max = M_PI 
+
+2. sin
+- A = 0.2, w = 0.2
+- A = 0.1, w = 2.0
+
+3. torque sin
+- A = 0.5, w = 2.0
+- A = 1.0, w = 6.0

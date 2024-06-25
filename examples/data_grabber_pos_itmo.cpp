@@ -153,6 +153,8 @@ int main(int argc, char *argv[]) {
     arm._ctrlComp->lowcmd->setControlGain(KP, KW);
     arm.sendRecvThread->shutdown();
 
+    simple_logger("Control loop [Hz]: " + std::to_string(1/arm._ctrlComp->dt));
+
     Vec6 vec_zero; vec_zero.setZero();
     Vec6 q_0;
     Vec6 q_des;
@@ -197,9 +199,9 @@ int main(int argc, char *argv[]) {
             double q_00 = q_0(k);
             double q_0des = q_0(k);
 
-            double delta_des = M_PI; // desired delta offset
+            double delta_des = M_PI/2; // desired delta offset
 
-            simple_logger("Experiment: trapezoidal +- M_PI x10 times.");
+            simple_logger("Experiment: trapezoidal +- M_PI/2 x10 times.");
 
             for (int j(0); j < 10; ++j) { // change setpoint \times 10 
                 simple_logger("Progress: " + std::to_string(j) + "/10");
@@ -213,7 +215,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 // setup desired motion
-                ramp.setup(q_00, q_0des, M_PI, 2*M_PI); // q0, q_des, dq_max, ddq_max
+                ramp.setup(q_00, q_0des, M_PI/2, M_PI); // q0, q_des, dq_max, ddq_max
 
                 // moving + waiting time
                 double duration = 1.5 * ramp.get_time_total() / arm._ctrlComp->dt;
@@ -271,7 +273,7 @@ int main(int argc, char *argv[]) {
 
                 sinusoid.setup(q_00, A, omega);
 
-                for(int i(0); i < 1000 * T; i++){ // 60 second for dt=0.01
+                for(int i(0); i < 3000 * T; i++){ // ~30 second for dt=0.002
                     sinusoid.update(arm._ctrlComp->dt);
 
                     arm.q = to_vec6(q_0, sinusoid.q, k);

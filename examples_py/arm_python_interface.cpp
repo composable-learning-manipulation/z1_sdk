@@ -56,9 +56,14 @@ PYBIND11_MODULE(unitree_arm_interface, m){
         .def("getGripperQ", &LowlevelState::getGripperQ, rvp::reference_internal)
         ;
 
+    py::class_<LowlevelCmd>(m, "LowlevelCmd")
+        .def("setControlGain", py::overload_cast<std::vector<double>, std::vector<double>>(&LowlevelCmd::setControlGain))
+        ;
+
     py::class_<CtrlComponents>(m, "CtrlComponents")
         .def_readwrite("armModel", &CtrlComponents::armModel)
         .def_readonly("dt", &CtrlComponents::dt)
+        .def_readonly("lowcmd", &CtrlComponents::lowcmd)
         ;
 
     py::class_<Z1Model>(m, "Z1Model")

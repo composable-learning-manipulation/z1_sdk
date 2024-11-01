@@ -62,7 +62,7 @@ PYBIND11_MODULE(unitree_arm_interface, m){
 
     py::class_<CtrlComponents>(m, "CtrlComponents")
         .def_readwrite("armModel", &CtrlComponents::armModel)
-        .def_readonly("dt", &CtrlComponents::dt)
+        .def_readwrite("dt", &CtrlComponents::dt)
         .def_readonly("lowcmd", &CtrlComponents::lowcmd)
         ;
 
